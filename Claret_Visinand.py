@@ -37,3 +37,10 @@ def get_graph(file, positions):
             graph[value[0]].update([(key, value[1])])
 
     return graph
+
+
+if __name__ == "__main__":
+    filename_positions = "positions.txt"
+    filename_connections = "connections.txt"
+    positions = get_positions(filename_positions)
+    graph = get_graph(filename_connections, positions)
