@@ -1,13 +1,10 @@
 import os, sys
 
-#import pygame
-#from pygame.locals import *
-import littleCity
+# import pygame
+# from pygame.locals import *
+
 import drMaboule
-import geneticAlgoritm as ga
-import transgenicBanana as tb
 import time
-from time import time
 
 import math
 
@@ -15,9 +12,10 @@ import random
 
 from collections import OrderedDict
 
-#if not pygame.font:
+
+# if not pygame.font:
 #    print('Warning, fonts disabled')
-#if not pygame.mixer:
+# if not pygame.mixer:
 #    print('Warning, sound disabled')
 
 
@@ -29,10 +27,10 @@ def ga_solve(filename, gui, maxtime):
     :return: length (fitness), path (chemin de villes)
     """
 
-    #Parse
+    # Parse
     nodes_distances_dict = data_parser(filename)
 
-    #Start !
+    # Start !
     global verbose
     verbose = False
 
@@ -44,18 +42,34 @@ def ga_solve(filename, gui, maxtime):
 
     return darwinism(create_population())
 
-def dist(city1,city2):
-    x1,y1 = city1
-    x2,y2 = city2
-    return math.hypot(x2 -x1,y2-y1)
 
-def distance(p1, p2):
-    d = (((p2[0] - p1[0])**2) + ((p2[1] - p1[1])**2))**.5
-    return int(d)
+def ga_solver_brute(filename, gui, maxtime, populationsize, tournaments, elitismrate, mutationrate):
+    # Parse
+    nodes_distances_dict = data_parser(filename)
+
+    # Start !
+    global verbose
+    verbose = False
+
+    global global_nodes_dict
+    global_nodes_dict = nodes_distances_dict
+
+    global global_TransgenicBanana
+    global_TransgenicBanana = TransgenicBanana(maxtime, False, _populationsize=populationsize, _tournaments=tournaments,
+                                               _elitismrate=elitismrate, _mutationrate=mutationrate)
+
+    return darwinism(create_population())
+
+
+def dist(city1, city2):
+    x1, y1 = city1
+    x2, y2 = city2
+    return math.hypot(x2 - x1, y2 - y1)
+
 
 class TransgenicBanana:
-    def __init__(self, _maxtime, _useclonelimit, _populationsize=100, _tournaments=5, _elitismrate=0.1, _maxgenerations=2000, _usemaxgenerations=False,
-                 _mutationrate=range(1, 4), _clonelimit=30):
+    def __init__(self, _maxtime, _useclonelimit, _populationsize=100, _tournaments=7, _elitismrate=0.1,
+                 _maxgenerations=2000, _usemaxgenerations=False, _mutationrate=0.4, _clonelimit=30):
         self.population_size = _populationsize
         self.tournaments = _tournaments
         self.elitism_rate = _elitismrate
@@ -80,8 +94,8 @@ class TransgenicBanana:
         looped_chromosome.append(_chromosome[0])
         _chromosome = tuple(looped_chromosome)
 
-        return sum((global_nodes_dict[_chromosome[gene - 1]][_chromosome[gene]] for gene in range(1, len(_chromosome))))
-
+        return sum(
+            (global_nodes_dict[_chromosome[gene]][_chromosome[gene + 1]] for gene in range(0, len(_chromosome) - 1)))
 
     def mutation(self, _chromosome):
         """
@@ -93,8 +107,8 @@ class TransgenicBanana:
         :return: _chromosome mutated or not
         """
 
-        probability = random.randint(1, 100)
-        if probability in self.mutation_rate:
+        probability = random.randint(1, 100) / 100
+        if probability >= self.mutation_rate:
             parts = sorted(random.sample(list(range(1, len(_chromosome))), 2))
             _chromosome[parts[0]], _chromosome[parts[1]] = _chromosome[parts[1]], _chromosome[parts[0]]
 
@@ -157,10 +171,10 @@ class TransgenicBanana:
 
 
 def bird_distance(node1, node2):
-    #return int(math.sqrt(math.pow((node2[0] - node1[0]), 2) + pow((node2[1] - node1[1]), 2)))
-    x1,y1 = node1
-    x2,y2 = node2
-    return math.hypot(x2 -x1,y2-y1)
+    # return int(math.sqrt(math.pow((node2[0] - node1[0]), 2) + pow((node2[1] - node1[1]), 2)))
+    x1, y1 = node1
+    x2, y2 = node2
+    return math.hypot(x2 - x1, y2 - y1)
 
 
 def data_parser(file=None):
@@ -249,7 +263,7 @@ def darwinism(population):
     best_transgenic_banana = list(population.items())[0]
     clone_counter = 0
 
-    start = time()
+    start = time.time()
     generation = 0
     while generation < global_TransgenicBanana.max_generations or not global_TransgenicBanana.use_max_generation:
 
@@ -265,13 +279,12 @@ def darwinism(population):
             best_transgenic_banana = current_banana_king
             del elite[elite.index(current_banana_king[0])]
 
-        #Stop Algo
+        # Stop Algo
         if global_TransgenicBanana.clone_limit == clone_counter \
-                and global_TransgenicBanana.use_clone_limit :
+                and global_TransgenicBanana.use_clone_limit:
             if verbose:
                 print("Clone limit achieved :)")
             break
-
 
         noble_population_list.append(best_transgenic_banana[0])
         noble_population_list.extend(elite)
@@ -285,7 +298,7 @@ def darwinism(population):
         fitness_list = [global_TransgenicBanana.fitness(chromosome) for chromosome in noble_population_list]
         population = dict(zip(noble_population_list, fitness_list))
         population = OrderedDict(sorted(population.items(), key=lambda t: t[1]))
-        #print(population)
+        # print(population)
 
         if verbose:
             fitness_average = int(sum(list(population.values())) / len(population))
@@ -302,19 +315,17 @@ def darwinism(population):
             print("Distance: " + str(fittest_value))
             print("-----------------------------")
 
-        generation+=1
+        generation += 1
 
-        if (time()-start) >= global_TransgenicBanana.maxtime:
+        if (time.time() - start) >= global_TransgenicBanana.maxtime:
             if verbose:
                 print("Time finished")
             break
 
-    #convert 1 to 'v0', 2 to 'v1' ...
+    # convert 1 to 'v0', 2 to 'v1' ...
     best_city_path = []
     for cityNb in best_transgenic_banana[0]:
-        best_city_path.append('v'+str(cityNb-1))
-
-
+        best_city_path.append('v' + str(cityNb - 1))
 
     print("\n  _____ _          _  ___                          _            _ ")
     print(" |_   _| |_  ___  | |/ (_)_ _  __ _   __ _ _ _ _ _(_)_ _____ __| |")
@@ -326,15 +337,9 @@ def darwinism(population):
     print('Best Distance: ' + str(best_transgenic_banana[1]))
     print('Nb generation: ' + str(generation))
 
-
-
     return best_transgenic_banana[1], best_city_path
 
 
-
-
 if __name__ == "__main__":
-    #test here
-    print("\nga_solve : ", ga_solve("data/pb005.txt", False, 2))
-
-
+    # test here
+    print("\nga_solve : ", ga_solve("data/pb050.txt", False, 30))
