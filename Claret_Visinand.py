@@ -293,7 +293,14 @@ def darwinism(population):
     for cityNb in best_transgenic_banana[0]:
         best_city_path.append('v'+str(cityNb-1))
 
-    print('====>>> The King arrived <<<===')
+
+
+    print("\n  _____ _          _  ___                          _            _ ")
+    print(" |_   _| |_  ___  | |/ (_)_ _  __ _   __ _ _ _ _ _(_)_ _____ __| |")
+    print("   | | | ' \/ -_) | ' <| | ' \/ _` | / _` | '_| '_| \ V / -_) _` |")
+    print("   |_| |_||_\___| |_|\_\_|_||_\__, | \__,_|_| |_| |_|\_/\___\__,_|")
+    print("                              |___/                               ")
+
     print('Best Transgenic Banana: ' + str(best_city_path))
     print('Best Distance: ' + str(best_transgenic_banana[1]))
     print('Nb generation: ' + str(generation))
