@@ -27,8 +27,8 @@ modules = (
 # <datafile> est le fichier contenant les données du problème et
 # <maxtime> le temps (en secondes) imparti pour la résolution
 tests = (
-    ('data/pb005.txt',1),
-    #~ ('data/pb010.txt',5),
+    #('data/pb005.txt',1),
+    ('data/pb010.txt',5),
     #~ ('data/pb010.txt',10),
     #~ ('data/pb050.txt',30),
     #~ ('data/pb050.txt',60),
@@ -59,7 +59,9 @@ import os
 from time import time
 from math import hypot
 
-def dist(x1,y1,x2,y2):
+def dist(city1,city2):
+    x1,y1 = city1
+    x2,y2 = city2
     return hypot(x2 -x1,y2-y1)
 
 def validate(filename, length, path, duration, maxtime):
@@ -80,6 +82,7 @@ def validate(filename, length, path, duration, maxtime):
     try:
         totaldist = 0
         for (ci, cj) in zip(path, path[1:] +path[0:1]):
+
             totaldist += dist(cities[ci],cities[cj]) #bug here....
             tovisit.remove(ci)
             

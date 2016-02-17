@@ -144,7 +144,10 @@ class TransgenicBanana:
 
 
 def bird_distance(node1, node2):
-    return int(math.sqrt(math.pow((node2[0] - node1[0]), 2) + pow((node2[1] - node1[1]), 2)))
+    #return int(math.sqrt(math.pow((node2[0] - node1[0]), 2) + pow((node2[1] - node1[1]), 2)))
+    x1,y1 = node1
+    x2,y2 = node2
+    return math.hypot(x2 -x1,y2-y1)
 
 
 def data_parser(file=None):
@@ -251,8 +254,7 @@ def darwinism(population):
 
         #Stop Algo
         if global_TransgenicBanana.clone_limit == clone_counter \
-                and global_TransgenicBanana.use_clone_limit \
-                or (time()-start) >= global_TransgenicBanana.maxtime:
+                and global_TransgenicBanana.use_clone_limit :
             if verbose:
                 print("Clone limit achieved :)")
             break
@@ -270,6 +272,7 @@ def darwinism(population):
         fitness_list = [global_TransgenicBanana.fitness(chromosome) for chromosome in noble_population_list]
         population = dict(zip(noble_population_list, fitness_list))
         population = OrderedDict(sorted(population.items(), key=lambda t: t[1]))
+        print(population)
 
         if verbose:
             fitness_average = int(sum(list(population.values())) / len(population))
@@ -288,7 +291,12 @@ def darwinism(population):
 
         generation+=1
 
-    #convert 0 to 'v1', 1 to 'v2' ...
+        if (time()-start) >= global_TransgenicBanana.maxtime:
+            if verbose:
+                print("Time finished")
+            break
+
+    #convert 1 to 'v0', 2 to 'v1' ...
     best_city_path = []
     for cityNb in best_transgenic_banana[0]:
         best_city_path.append('v'+str(cityNb-1))
