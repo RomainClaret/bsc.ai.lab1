@@ -18,7 +18,7 @@ v0.3, hatem Ghorbel, HE-Arc
 # Ces modules doivent être dans le PYTHONPATH; p.ex. dans le répertoire courant
 
 modules = (
-	"MAA09",
+	"Claret_Visinand",
 	# Éventuellement d'autres modules pour comparer plusieurs versions...
 )
 
@@ -80,7 +80,7 @@ def validate(filename, length, path, duration, maxtime):
     try:
         totaldist = 0
         for (ci, cj) in zip(path, path[1:] +path[0:1]):
-            totaldist += dist(cities[ci],cities[cj])
+            totaldist += dist(cities[ci],cities[cj]) #bug here....
             tovisit.remove(ci)
             
         if int(totaldist) != int(length):

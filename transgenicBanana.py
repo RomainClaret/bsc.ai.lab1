@@ -11,13 +11,14 @@ from collections import OrderedDict
 
 class TransgenicBanana:
     def __init__(self, _populationsize=100, _tournaments=5, _elitismrate=0.1, _maxgenerations=2000,
-                 _mutationrate=range(1, 4), _clonelimit=30):
+                 _mutationrate=range(1, 4), _clonelimit=30, _useclonelimit=True):
         self.population_size = _populationsize
         self.tournaments = _tournaments
         self.elitism_rate = _elitismrate
         self.max_generations = _maxgenerations
         self.mutation_rate = _mutationrate
         self.clone_limit = _clonelimit
+        self.use_clone_limit = _useclonelimit
 
         self.elite_amount = int(self.population_size * self.elitism_rate)
 
@@ -206,7 +207,7 @@ def darwinism(population):
             best_transgenic_banana = current_banana_king
             del elite[elite.index(current_banana_king[0])]
 
-        if global_TransgenicBanana.clone_limit == clone_counter:
+        if global_TransgenicBanana.clone_limit == clone_counter and global_TransgenicBanana.use_clone_limit:
             print()
             print("Clone limit achieved :)")
             break
@@ -246,18 +247,18 @@ def darwinism(population):
     return best_transgenic_banana[1]
 
 
-def create_ultimate_banana(_distances_dict, _verbose=False):
+def create_ultimate_banana(_distances_dict, _verbose=False, _useclonelimit=True):
     global verbose
     verbose = _verbose
     global global_nodes_dict
     global_nodes_dict = _distances_dict
     global global_TransgenicBanana
-    global_TransgenicBanana = TransgenicBanana()
+    global_TransgenicBanana = TransgenicBanana(_useclonelimit=_useclonelimit)
     return darwinism(create_population())
 
 
 if __name__ == "__main__":
-    data_filename = "pb010.txt"
+    data_filename = "pb005.txt"
     number_of_tests = 2
 
     nodes_distances_dict = data_parser('data/' + data_filename)
