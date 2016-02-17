@@ -44,7 +44,14 @@ def ga_solve(filename, gui, maxtime):
 
     return darwinism(create_population())
 
+def dist(city1,city2):
+    x1,y1 = city1
+    x2,y2 = city2
+    return math.hypot(x2 -x1,y2-y1)
 
+def distance(p1, p2):
+    d = (((p2[0] - p1[0])**2) + ((p2[1] - p1[1])**2))**.5
+    return int(d)
 
 class TransgenicBanana:
     def __init__(self, _maxtime, _useclonelimit, _populationsize=100, _tournaments=5, _elitismrate=0.1, _maxgenerations=2000, _usemaxgenerations=False,
@@ -63,12 +70,18 @@ class TransgenicBanana:
 
     def fitness(self, _chromosome):
         """
-        Calculates the travel distance for a chromosome.
+        First looping the chromosome, last goes to first
+        Calculates the total travel distance for a chromosome.
         :param _chromosome: chromosome to get the travel distance
         :return: travel_distance
         """
 
+        looped_chromosome = list(_chromosome)
+        looped_chromosome.append(_chromosome[0])
+        _chromosome = tuple(looped_chromosome)
+
         return sum((global_nodes_dict[_chromosome[gene - 1]][_chromosome[gene]] for gene in range(1, len(_chromosome))))
+
 
     def mutation(self, _chromosome):
         """
@@ -272,7 +285,7 @@ def darwinism(population):
         fitness_list = [global_TransgenicBanana.fitness(chromosome) for chromosome in noble_population_list]
         population = dict(zip(noble_population_list, fitness_list))
         population = OrderedDict(sorted(population.items(), key=lambda t: t[1]))
-        print(population)
+        #print(population)
 
         if verbose:
             fitness_average = int(sum(list(population.values())) / len(population))
@@ -322,6 +335,6 @@ def darwinism(population):
 
 if __name__ == "__main__":
     #test here
-    print("\nga_solve : ", ga_solve("data/pb020.txt", False, 2))
+    print("\nga_solve : ", ga_solve("data/pb005.txt", False, 2))
 
 
