@@ -74,16 +74,17 @@ def validate(filename, length, path, duration, maxtime):
     if duration>maxtime * (1+tolerance):
         error += "Timeout (%.2f) " % (duration-maxtime)
     try:
-        cities = dict([(name, (int(x),int(y))) for name,x,y in [l.split() for l in file(filename)]])
+        cities = dict([(name, (int(x),int(y))) for name,x,y in [l.split() for l in open(filename)]])
     except:
+        print(sys.exc_info()[0])
         return "(Validation failed...)"
-    tovisit = cities.keys()
+    tovisit = list(cities.keys())
     
     try:
         totaldist = 0
         for (ci, cj) in zip(path, path[1:] +path[0:1]):
 
-            totaldist += dist(cities[ci],cities[cj]) #bug here....
+            totaldist += dist(cities[ci],  cities[cj]) #bug here....
             tovisit.remove(ci)
             
         if int(totaldist) != int(length):
