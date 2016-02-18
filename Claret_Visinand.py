@@ -64,8 +64,8 @@ def dist(city1, city2):
 
 
 class TransgenicBanana:
-    def __init__(self, _maxtime, _useclonelimit, _populationsize=100, _tournaments=4, _elitismrate=0.9,
-                 _maxgenerations=2000, _usemaxgenerations=False, _mutationrate=0.1, _clonelimit=30):
+    def __init__(self, _maxtime, _useclonelimit, _populationsize=100, _tournaments=3, _elitismrate=0.4,
+                 _maxgenerations=2000, _usemaxgenerations=False, _mutationrate=0.3, _clonelimit=30):
         self.population_size = _populationsize
         self.tournaments = _tournaments
         self.elitism_rate = _elitismrate
