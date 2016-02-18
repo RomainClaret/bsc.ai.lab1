@@ -84,7 +84,7 @@ def validate(filename, length, path, duration, maxtime):
         totaldist = 0
         for (ci, cj) in zip(path, path[1:] +path[0:1]):
 
-            totaldist += dist(cities[ci],  cities[cj]) #bug here....
+            totaldist += dist(cities[ci],  cities[cj])
             tovisit.remove(ci)
             
         if int(totaldist) != int(length):
