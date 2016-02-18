@@ -37,6 +37,7 @@ def ga_solve(filename, gui, maxtime):
 
     if filename == None:
         #todo : clic clic interface
+        print("TODO")
         
     else:
         # Parse
