@@ -1,7 +1,8 @@
 import os, sys
 
-# import pygame
-# from pygame.locals import *
+import pygame
+from pygame.locals import *
+from pygame.locals import KEYDOWN, QUIT, MOUSEBUTTONDOWN, K_RETURN, K_ESCAPE
 
 import drMaboule
 import time
@@ -19,6 +20,17 @@ from collections import OrderedDict
 #    print('Warning, sound disabled')
 
 
+#Const necessary for pygame
+screen_x = 500
+screen_y = 500
+
+city_color = [10,10,200] # blue
+city_radius = 3
+
+font_color = [255,255,255] # white
+
+
+
 def ga_solve(filename, gui, maxtime):
     """
     :param filename: ....txt
@@ -27,8 +39,28 @@ def ga_solve(filename, gui, maxtime):
     :return: length (fitness), path (chemin de villes)
     """
 
-    # Parse
-    nodes_distances_dict = data_parser(filename)
+    if filename == None:
+        #todo : clic clic interface
+        
+    else:
+        # Parse
+        nodes_distances_dict, nodes_pos = data_parser(filename)
+
+
+    screen = None
+    # Show
+    if gui:
+        pygame.init()
+        window = pygame.display.set_mode((screen_x, screen_y))
+        pygame.display.set_caption('The king of bananas')
+        screen = pygame.display.get_surface()
+
+        screen.fill(0)
+        drawPoint(nodes_pos.values(), screen)
+        pygame.display.flip()
+
+        event = pygame.event.wait()
+
 
     # Start !
     global verbose
@@ -40,12 +72,54 @@ def ga_solve(filename, gui, maxtime):
     global global_TransgenicBanana
     global_TransgenicBanana = TransgenicBanana(maxtime, False)
 
-    return darwinism(create_population())
+    return darwinism(create_population(), nodes_pos, screen)
+
+
+def drawPoint(positions, screen):
+    font = pygame.font.Font(None,30)
+
+    for pos in positions:
+        print("city pos :",pos)
+        pygame.draw.circle(screen,city_color,pos,city_radius)
+    text = font.render("Nombre: %i" % len(positions), True, font_color)
+    textRect = text.get_rect()
+    screen.blit(text, textRect)
+
+
+
+def drawChromosome(screen, transgenic_banana, nodes_pos, score):
+    screen.fill(0)
+
+    oldCityId = transgenic_banana[0]
+
+    i=1
+    while i < len(transgenic_banana):
+        cityId = transgenic_banana[i]
+
+        city1 = nodes_pos[cityId]
+        city2 = nodes_pos[oldCityId]
+
+        print("city1", city1)
+        print("city2", city2)
+
+        pygame.draw.line(screen, [240,255,0], city1, city2, 2)
+
+        oldCityId = cityId
+        i+=1
+
+    font = pygame.font.Font(None,30)
+    text = font.render("Score: %i" % score, True, font_color)
+    textRect = text.get_rect()
+    screen.blit(text, (0, 20))
+
+    drawPoint(nodes_pos.values(), screen)
+    pygame.display.flip()
+
 
 
 def ga_solver_brute(filename, gui, maxtime, populationsize, tournaments, elitismrate, mutationrate):
     # Parse
-    nodes_distances_dict = data_parser(filename)
+    nodes_distances_dict, node_pos = data_parser(filename)
 
     # Start !
     global verbose
@@ -185,10 +259,12 @@ def data_parser(file=None):
     nodes_dict = {}
     data_file = open(file, 'r')
 
+
     for line in data_file:
         values = line.split()
         # For the values structure: v0 1 2
         nodes_dict[int(values[0][1:]) + 1] = (int(values[1]), int(values[2]))
+
 
     for node in list(nodes_dict.keys()):
         distances_dict = {}
@@ -200,7 +276,7 @@ def data_parser(file=None):
 
         data_dict[node] = distances_dict
 
-    return data_dict
+    return data_dict, nodes_dict #nodes_dict contain pos
 
 
 def create_population():
@@ -240,7 +316,7 @@ def create_population():
     return population
 
 
-def darwinism(population):
+def darwinism(population, nodes_pos, screen=None):
     """
     Here we go, the world need a strong banana for the leadership. Everybody knows that the best are mutants!
     Generation after generation, the one shall raise.
@@ -315,12 +391,22 @@ def darwinism(population):
             print("Distance: " + str(fittest_value))
             print("-----------------------------")
 
-        generation += 1
+
+        if screen is not None:
+
+            #GUI is ON
+            print('Current King: ' + str(best_transgenic_banana[0]))
+            drawChromosome(screen, best_transgenic_banana[0], nodes_pos, best_transgenic_banana[1])
+
+
 
         if (time.time() - start) >= global_TransgenicBanana.maxtime:
             if verbose:
                 print("Time finished")
             break
+
+        generation += 1
+
 
     # convert 1 to 'v0', 2 to 'v1' ...
     best_city_path = []
@@ -340,6 +426,7 @@ def darwinism(population):
     return best_transgenic_banana[1], best_city_path
 
 
+
 if __name__ == "__main__":
     # test here
-    print("\nga_solve : ", ga_solve("data/pb050.txt", False, 30))
+    print("\nga_solve : ", ga_solve("data/pb100.txt", True, 20))
