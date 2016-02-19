@@ -8,6 +8,8 @@ et génère une grille de résultats au format CSV.
 
 v0.2, Matthieu Amiguet, HE-Arc
 v0.3, hatem Ghorbel, HE-Arc
+
+Python 3.5 Ready, Romain Claret
 '''
 
 # PARAMETRES

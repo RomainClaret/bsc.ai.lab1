@@ -65,43 +65,6 @@ def dist(city1,city2):
     x2,y2 = city2
     return hypot(x2 -x1,y2-y1)
 
-def validate(filename, length, path, duration, maxtime):
-    '''Validation de la solution
-    
-    retourne une chaîne vide si tout est OK ou un message d'erreur sinon
-    '''
-    error = ""
-    
-    if duration>maxtime * (1+tolerance):
-        error += "Timeout (%.2f) " % (duration-maxtime)
-    try:
-        cities = dict([(name, (int(x),int(y))) for name,x,y in [l.split() for l in file(filename)]])
-    except:
-        return "(Validation failed...)"
-    tovisit = cities.keys()
-    
-    try:
-        totaldist = 0
-        for (ci, cj) in zip(path, path[1:] +path[0:1]):
-
-            totaldist += dist(cities[ci],cities[cj]) #bug here....
-            tovisit.remove(ci)
-            
-        if int(totaldist) != int(length):
-            error += "Wrong dist! (%d instead of %d)" % (length, totaldist)
-    except KeyError:
-        error += "City %s does not exist! " % ci
-    except ValueError:
-        error += "City %s appears twice in %r! " % (ci, path)
-    except Exception as e:
-        error += "Error during validation: %r" % e
-    
-    if tovisit:
-        error += "Not all cities visited! %r" % tovisit
-    
-    return error
-
-
 def main(_commands=None):
 
     if _commands is not None:
