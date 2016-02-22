@@ -139,8 +139,8 @@ def dist(city1, city2):
 
 
 class TransgenicBanana:
-    def __init__(self, _maxtime, _useclonelimit, _populationsize=100, _tournaments=3, _elitismrate=0.4,
-                 _maxgenerations=2000, _usemaxgenerations=False, _mutationrate=0.3, _clonelimit=30):
+    def __init__(self, _maxtime, _useclonelimit, _populationsize=7, _tournaments=3, _elitismrate=0.8,
+                 _maxgenerations=2000, _usemaxgenerations=False, _mutationrate=0.2, _clonelimit=30):
         self.population_size = _populationsize
         self.tournaments = _tournaments
         self.elitism_rate = _elitismrate
@@ -268,7 +268,6 @@ class TransgenicBanana:
 
 
 def bird_distance(node1, node2):
-    # return int(math.sqrt(math.pow((node2[0] - node1[0]), 2) + pow((node2[1] - node1[1]), 2)))
     x1, y1 = node1
     x2, y2 = node2
     return math.hypot(x2 - x1, y2 - y1)
@@ -349,7 +348,7 @@ def darwinism(population, nodes_pos, screen=None):
             - Check if previous king is a clone of the current king, if the clone limit is passed, we have the one
             - If the limit is not passed, add the other elites with king to the noble population
             - Then do the evolution
-                - Selection (tournament)
+                - Selection (tournament, ranked, roulette)
                 - Crossover (breed)
                 - Mutation (the world rulers)
                 - Population Replacement (Darwin Awards)
@@ -390,8 +389,8 @@ def darwinism(population, nodes_pos, screen=None):
 
         while len(noble_population_list) != global_TransgenicBanana.population_size:
             # Selection part
-            # Should use the random function below? Or a manually defined one?
-            answer = True
+            # Should use the selection function shuffle below?
+            answer = False
             if answer:
                 selections = [
                     global_TransgenicBanana.selection_tournament(population),
@@ -403,7 +402,7 @@ def darwinism(population, nodes_pos, screen=None):
                 #couple = global_TransgenicBanana.selection_tournament(population), global_TransgenicBanana.selection_tournament(population)
                 #couple = global_TransgenicBanana.selection_roulette(population), global_TransgenicBanana.selection_roulette(population)
                 couple = global_TransgenicBanana.selection_rank(population), global_TransgenicBanana.selection_rank(population)
-                #couple = global_TransgenicBanana.selection_roulette(population), global_TransgenicBanana.selection_rank(population)
+                #couple = global_TransgenicBanana.selection_rank(population), global_TransgenicBanana.selection_roulette(population)
 
             transgenic_banana = global_TransgenicBanana.crossover(couple)
             muted_transgenic_banana = global_TransgenicBanana.mutation(transgenic_banana)
@@ -467,4 +466,4 @@ def darwinism(population, nodes_pos, screen=None):
 
 if __name__ == "__main__":
     # test here
-    print("\nga_solve : ", ga_solve("data/pb100.txt", True, 20))
+    print("\nga_solve : ", ga_solve("data/pb100.txt", False, 20))
