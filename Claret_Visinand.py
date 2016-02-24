@@ -85,7 +85,7 @@ def ga_solve(filename=None, gui=True, maxtime=0):
 
     # Start !
     global verbose
-    verbose = False
+    verbose = True
 
     global global_nodes_dict
     global_nodes_dict = nodes_distances_dict
@@ -163,12 +163,12 @@ def dist(city1, city2):
 
 class TransgenicBanana:
     def __init__(self, _maxtime, _populationsize=7, _tournaments=3, _elitismrate=0.8,
-                 _maxgenerations=2000, _mutationrate=0.2, _clonelimit=30):
+                 _maxgenerations=2000, _mutationrate=0.2, _clonelimit=50):
         self.population_size = _populationsize
         self.tournaments = _tournaments
         self.elitism_rate = _elitismrate
         self.max_generations = _maxgenerations
-        self.use_max_generation = (_maxtime <= 0)
+        self.use_max_generation = False
         self.mutation_rate = _mutationrate
         self.clone_limit = _clonelimit
         self.use_clone_limit = (_maxtime <= 0)
@@ -411,11 +411,10 @@ def darwinism(population, nodes_pos, screen=None):
     start = time.time()
     generation = 0
 
-    print("global_TransgenicBanana.use_max_generation", global_TransgenicBanana.use_max_generation)
     print("generation < global_TransgenicBanana.max_generations", generation < global_TransgenicBanana.max_generations)
-    print("generation < global_TransgenicBanana.max_generations and global_TransgenicBanana.use_max_generation", generation < global_TransgenicBanana.max_generations and global_TransgenicBanana.use_max_generation)
+    print("global_TransgenicBanana.use_max_generation", global_TransgenicBanana.use_max_generation)
+    while (generation < global_TransgenicBanana.max_generations or not global_TransgenicBanana.use_max_generation) or global_TransgenicBanana.use_clone_limit:
 
-    while generation < global_TransgenicBanana.max_generations or global_TransgenicBanana.use_max_generation:
 
         noble_population_list = []
 
@@ -429,10 +428,12 @@ def darwinism(population, nodes_pos, screen=None):
             best_transgenic_banana = current_banana_king
             del elite[elite.index(current_banana_king[0])]
 
+
         # Stop Algo
-        if global_TransgenicBanana.clone_limit == clone_counter \
-                and global_TransgenicBanana.use_clone_limit:
+        if global_TransgenicBanana.clone_limit == clone_counter and global_TransgenicBanana.use_clone_limit:
             if verbose:
+                print("clone counter  : ", clone_counter)
+                print("clone limit : ", global_TransgenicBanana.clone_limit)
                 print("Clone limit achieved :)")
             break
 
@@ -485,7 +486,7 @@ def darwinism(population, nodes_pos, screen=None):
             #GUI is ON
             drawChromosome(screen, best_transgenic_banana[0], nodes_pos, best_transgenic_banana[1])
 
-        if (time.time() - start) >= global_TransgenicBanana.maxtime and not global_TransgenicBanana.use_max_generation:
+        if (time.time() - start) >= global_TransgenicBanana.maxtime and (global_TransgenicBanana.maxtime > 0):
             if verbose:
                 print("Time finished")
             break
