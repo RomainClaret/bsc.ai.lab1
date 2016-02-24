@@ -162,8 +162,8 @@ def dist(city1, city2):
 
 
 class TransgenicBanana:
-    def __init__(self, _maxtime, _populationsize=100, _tournaments=7, _elitismrate=0.1,
-                 _maxgenerations=2000, _mutationrate=0.4, _clonelimit=30):
+    def __init__(self, _maxtime, _populationsize=7, _tournaments=3, _elitismrate=0.8,
+                 _maxgenerations=2000, _mutationrate=0.2, _clonelimit=30):
         self.population_size = _populationsize
         self.tournaments = _tournaments
         self.elitism_rate = _elitismrate
@@ -212,26 +212,52 @@ class TransgenicBanana:
     def selection_tournament(self, _population):
         """
         Select a random number of random chromosomes from the population.
-        Sorted them and make a couple out of the two best.
+        Sort them and take the best!
         :param _population: population of chromosomes
         :return: best couple
         """
 
         winners = random.sample(list(_population.items()), self.tournaments)
         sorted_winners = sorted(winners, key=lambda t: t[1])
-        return sorted_winners[0][0], sorted_winners[1][0]
+        return sorted_winners[0][0]
 
-    def selection_roulette(self, chromosomes, fitnesses, targetNbChromosome):
+    def selection_rank(self, _population):
         """
-        Uses the roulette implementation of doctor Maboule
-        :param chromosomes:
-        :param fitnesses:
-        :param targetNbChromosome:
-        :return:
+        Select the best chromosome from the population based on its rank.
+        The rank is defined randomly.
+        :param _population: population of chromosomes
+        :return: the best chromosome for this ranking
         """
 
-        doctor = drMaboule.DrMaboule(["[v0(0;0)"])
-        return doctor.roulette(self, chromosomes, fitnesses, targetNbChromosome)
+        population_size = len(_population)
+        threshold = random.randint(1, (population_size * (population_size - 1)) / 2)
+        total_rank = 0
+
+        for index, chromosome in enumerate(sorted(_population, key=lambda t: t[1])):
+            current_rank = population_size - index
+            total_rank += current_rank
+            if threshold <= total_rank:
+                return chromosome
+
+    def selection_roulette(self, _population):
+        """
+        Select the best chromosome from the population based on its roulette spin.
+        Tournez Manege, C'est le jeu de la vie!
+        :param _population: population of chromosomes
+        :return: the best chromosome for this ranking
+        """
+
+        roulette = random.random()
+        threshold = list(_population.items())[0][1]
+        bottom_chance = 0.0
+
+        for index, chromosome in enumerate(sorted(_population, key=lambda t: t[1])):
+            current_chance = global_TransgenicBanana.fitness(chromosome) / threshold
+            top_chance = bottom_chance + current_chance
+            if bottom_chance <= roulette <= top_chance:
+                return chromosome
+            else:
+                bottom_chance = top_chance
 
     def crossover(self, _couple):
         """
@@ -266,7 +292,6 @@ class TransgenicBanana:
 
 
 def bird_distance(node1, node2):
-    # return int(math.sqrt(math.pow((node2[0] - node1[0]), 2) + pow((node2[1] - node1[1]), 2)))
     x1, y1 = node1
     x2, y2 = node2
     return math.hypot(x2 - x1, y2 - y1)
@@ -370,7 +395,7 @@ def darwinism(population, nodes_pos, screen=None):
             - Check if previous king is a clone of the current king, if the clone limit is passed, we have the one
             - If the limit is not passed, add the other elites with king to the noble population
             - Then do the evolution
-                - Selection (tournament)
+                - Selection (tournament, ranked, roulette)
                 - Crossover (breed)
                 - Mutation (the world rulers)
                 - Population Replacement (Darwin Awards)
@@ -415,7 +440,22 @@ def darwinism(population, nodes_pos, screen=None):
         noble_population_list.extend(elite)
 
         while len(noble_population_list) != global_TransgenicBanana.population_size:
-            couple = global_TransgenicBanana.selection_tournament(population)
+            # Selection part
+            # Should use the selection function shuffle below?
+            answer = False
+            if answer:
+                selections = [
+                    global_TransgenicBanana.selection_tournament(population),
+                    global_TransgenicBanana.selection_rank(population),
+                    global_TransgenicBanana.selection_roulette(population)
+                ]
+                couple = selections[random.randrange(0, len(selections), 1)], selections[random.randrange(0, len(selections), 1)]
+            else:
+                #couple = global_TransgenicBanana.selection_tournament(population), global_TransgenicBanana.selection_tournament(population)
+                #couple = global_TransgenicBanana.selection_roulette(population), global_TransgenicBanana.selection_roulette(population)
+                couple = global_TransgenicBanana.selection_rank(population), global_TransgenicBanana.selection_rank(population)
+                #couple = global_TransgenicBanana.selection_rank(population), global_TransgenicBanana.selection_roulette(population)
+
             transgenic_banana = global_TransgenicBanana.crossover(couple)
             muted_transgenic_banana = global_TransgenicBanana.mutation(transgenic_banana)
             noble_population_list.append(muted_transgenic_banana)
