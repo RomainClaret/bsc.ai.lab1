@@ -7,12 +7,6 @@ import random
 from collections import OrderedDict
 
 
-# if not pygame.font:
-#    print('Warning, fonts disabled')
-# if not pygame.mixer:
-#    print('Warning, sound disabled')
-
-
 #Values necessary for pygame
 screen_x = 500
 screen_y = 500
@@ -85,7 +79,7 @@ def ga_solve(filename=None, gui=True, maxtime=0):
 
     # Start !
     global verbose
-    verbose = True
+    verbose = False
 
     global global_nodes_dict
     global_nodes_dict = nodes_distances_dict
@@ -411,8 +405,6 @@ def darwinism(population, nodes_pos, screen=None):
     start = time.time()
     generation = 0
 
-    print("generation < global_TransgenicBanana.max_generations", generation < global_TransgenicBanana.max_generations)
-    print("global_TransgenicBanana.use_max_generation", global_TransgenicBanana.use_max_generation)
     while (generation < global_TransgenicBanana.max_generations or not global_TransgenicBanana.use_max_generation) or global_TransgenicBanana.use_clone_limit:
 
 
@@ -528,10 +520,6 @@ def darwinism(population, nodes_pos, screen=None):
 
 
 if __name__ == "__main__":
-    # test here
-    #print("\nga_solve : ", ga_solve("data/pb020.txt", True, 2))
-    #print("\nga_solve : ", ga_solve(None, True))
-
 
     gui = True
     fileName = None
