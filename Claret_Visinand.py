@@ -1,16 +1,9 @@
 import os, sys
-
 import pygame
 from pygame.locals import *
-from pygame.locals import KEYDOWN, QUIT, MOUSEBUTTONDOWN, K_RETURN, K_ESCAPE
-
-import drMaboule
 import time
-
 import math
-
 import random
-
 from collections import OrderedDict
 
 
@@ -20,7 +13,7 @@ from collections import OrderedDict
 #    print('Warning, sound disabled')
 
 
-#Const necessary for pygame
+#Values necessary for pygame
 screen_x = 500
 screen_y = 500
 
@@ -31,7 +24,7 @@ font_color = [255,255,255] # white
 
 
 
-def ga_solve(filename, gui, maxtime):
+def ga_solve(filename=None, gui=True, maxtime=0):
     """
     :param filename: ....txt
     :param gui: True or False #todo !
@@ -39,27 +32,55 @@ def ga_solve(filename, gui, maxtime):
     :return: length (fitness), path (chemin de villes)
     """
 
+
     if filename == None:
-        #todo : clic clic interface
-        
-    else:
-        # Parse
-        nodes_distances_dict, nodes_pos = data_parser(filename)
-
-
-    screen = None
-    # Show
-    if gui:
         pygame.init()
         window = pygame.display.set_mode((screen_x, screen_y))
         pygame.display.set_caption('The king of bananas')
         screen = pygame.display.get_surface()
 
         screen.fill(0)
-        drawPoint(nodes_pos.values(), screen)
-        pygame.display.flip()
 
-        event = pygame.event.wait()
+        collecting = True
+
+        font = pygame.font.Font(None,30)
+        cities = []
+
+        while collecting:
+            for event in pygame.event.get():
+                if event.type == QUIT:
+                    sys.exit(0)
+                elif event.type == KEYDOWN and event.key == K_RETURN:
+                    collecting = False
+                elif event.type == MOUSEBUTTONDOWN:
+                    cities.append(pygame.mouse.get_pos())
+                    screen.fill(0)
+                    drawPoint(cities, screen)
+                    pygame.display.flip()
+
+
+        nodes_distances_dict, nodes_pos = data_screen_parser(cities)
+
+
+    else:
+        # Parse
+        nodes_distances_dict, nodes_pos = data_parser(filename)
+
+        screen = None
+        # Show
+        if gui:
+            pygame.init()
+            window = pygame.display.set_mode((screen_x, screen_y))
+            pygame.display.set_caption('The king of bananas')
+            screen = pygame.display.get_surface()
+
+            screen.fill(0)
+            drawPoint(nodes_pos.values(), screen)
+            pygame.display.flip()
+
+            event = pygame.event.wait()
+
+
 
 
     # Start !
@@ -70,7 +91,7 @@ def ga_solve(filename, gui, maxtime):
     global_nodes_dict = nodes_distances_dict
 
     global global_TransgenicBanana
-    global_TransgenicBanana = TransgenicBanana(maxtime, False)
+    global_TransgenicBanana = TransgenicBanana(maxtime)
 
     return darwinism(create_population(), nodes_pos, screen)
 
@@ -79,7 +100,6 @@ def drawPoint(positions, screen):
     font = pygame.font.Font(None,30)
 
     for pos in positions:
-        print("city pos :",pos)
         pygame.draw.circle(screen,city_color,pos,city_radius)
     text = font.render("Nombre: %i" % len(positions), True, font_color)
     textRect = text.get_rect()
@@ -99,13 +119,13 @@ def drawChromosome(screen, transgenic_banana, nodes_pos, score):
         city1 = nodes_pos[cityId]
         city2 = nodes_pos[oldCityId]
 
-        print("city1", city1)
-        print("city2", city2)
-
         pygame.draw.line(screen, [240,255,0], city1, city2, 2)
 
         oldCityId = cityId
         i+=1
+
+    #last line
+    pygame.draw.line(screen, [240,255,0], nodes_pos[transgenic_banana[0]], nodes_pos[transgenic_banana[-1]], 2)
 
     font = pygame.font.Font(None,30)
     text = font.render("Score: %i" % score, True, font_color)
@@ -129,7 +149,7 @@ def ga_solver_brute(filename, gui, maxtime, populationsize, tournaments, elitism
     global_nodes_dict = nodes_distances_dict
 
     global global_TransgenicBanana
-    global_TransgenicBanana = TransgenicBanana(maxtime, False, _populationsize=populationsize, _tournaments=tournaments,
+    global_TransgenicBanana = TransgenicBanana(maxtime, _populationsize=populationsize, _tournaments=tournaments,
                                                _elitismrate=elitismrate, _mutationrate=mutationrate)
 
     return darwinism(create_population())
@@ -142,17 +162,18 @@ def dist(city1, city2):
 
 
 class TransgenicBanana:
-    def __init__(self, _maxtime, _useclonelimit, _populationsize=100, _tournaments=7, _elitismrate=0.1,
-                 _maxgenerations=2000, _usemaxgenerations=False, _mutationrate=0.4, _clonelimit=30):
+    def __init__(self, _maxtime, _populationsize=100, _tournaments=7, _elitismrate=0.1,
+                 _maxgenerations=2000, _mutationrate=0.4, _clonelimit=30):
         self.population_size = _populationsize
         self.tournaments = _tournaments
         self.elitism_rate = _elitismrate
         self.max_generations = _maxgenerations
-        self.use_max_generation = _usemaxgenerations
+        self.use_max_generation = (_maxtime <= 0)
         self.mutation_rate = _mutationrate
         self.clone_limit = _clonelimit
-        self.use_clone_limit = _useclonelimit
+        self.use_clone_limit = (_maxtime <= 0)
         self.maxtime = _maxtime
+
 
         self.elite_amount = int(self.population_size * self.elitism_rate)
 
@@ -250,12 +271,26 @@ def bird_distance(node1, node2):
     x2, y2 = node2
     return math.hypot(x2 - x1, y2 - y1)
 
+def dist_calcul(nodes_dict):
+    """
+    (pre)Calculate the distance between cities
+    """
+    data_dict = {}
+    for node in list(nodes_dict.keys()):
+        distances_dict = {}
+        for next_node in nodes_dict:
+            if next_node != node:
+                distances_dict[next_node] = bird_distance(nodes_dict[node], nodes_dict[next_node])
+            else:
+                distances_dict[next_node] = 0
+
+        data_dict[node] = distances_dict
+    return data_dict
 
 def data_parser(file=None):
     if file is None:
         return -1
 
-    data_dict = {}
     nodes_dict = {}
     data_file = open(file, 'r')
 
@@ -266,17 +301,26 @@ def data_parser(file=None):
         nodes_dict[int(values[0][1:]) + 1] = (int(values[1]), int(values[2]))
 
 
-    for node in list(nodes_dict.keys()):
-        distances_dict = {}
-        for next_node in nodes_dict:
-            if next_node != node:
-                distances_dict[next_node] = bird_distance(nodes_dict[node], nodes_dict[next_node])
-            else:
-                distances_dict[next_node] = 0
-
-        data_dict[node] = distances_dict
+    data_dict = dist_calcul(nodes_dict)
 
     return data_dict, nodes_dict #nodes_dict contain pos
+
+
+def data_screen_parser(citiesPos):
+
+    nodes_dict = {}
+
+    i=1
+    for city in citiesPos:
+        # For the values structure: v0 1 2
+        nodes_dict[i] = (int(city[0]), int(city[1]))
+        i+=1
+
+
+    data_dict = dist_calcul(nodes_dict)
+
+    return data_dict, nodes_dict #nodes_dict contain pos
+
 
 
 def create_population():
@@ -341,7 +385,12 @@ def darwinism(population, nodes_pos, screen=None):
 
     start = time.time()
     generation = 0
-    while generation < global_TransgenicBanana.max_generations or not global_TransgenicBanana.use_max_generation:
+
+    print("global_TransgenicBanana.use_max_generation", global_TransgenicBanana.use_max_generation)
+    print("generation < global_TransgenicBanana.max_generations", generation < global_TransgenicBanana.max_generations)
+    print("generation < global_TransgenicBanana.max_generations and global_TransgenicBanana.use_max_generation", generation < global_TransgenicBanana.max_generations and global_TransgenicBanana.use_max_generation)
+
+    while generation < global_TransgenicBanana.max_generations or global_TransgenicBanana.use_max_generation:
 
         noble_population_list = []
 
@@ -393,14 +442,10 @@ def darwinism(population, nodes_pos, screen=None):
 
 
         if screen is not None:
-
             #GUI is ON
-            print('Current King: ' + str(best_transgenic_banana[0]))
             drawChromosome(screen, best_transgenic_banana[0], nodes_pos, best_transgenic_banana[1])
 
-
-
-        if (time.time() - start) >= global_TransgenicBanana.maxtime:
+        if (time.time() - start) >= global_TransgenicBanana.maxtime and not global_TransgenicBanana.use_max_generation:
             if verbose:
                 print("Time finished")
             break
@@ -423,10 +468,47 @@ def darwinism(population, nodes_pos, screen=None):
     print('Best Distance: ' + str(best_transgenic_banana[1]))
     print('Nb generation: ' + str(generation))
 
+
+    if screen is not None :
+        font = pygame.font.Font(None,30)
+        text = font.render("The King arrived!", True, font_color)
+        screen.blit(text, (160, 10))
+
+        textE = font.render("Press ENTER", True, font_color)
+        screen.blit(textE, (180, 475))
+        pygame.display.flip()
+
+        while True:
+            event = pygame.event.wait()
+            if event.type == KEYDOWN: break
+
     return best_transgenic_banana[1], best_city_path
 
 
 
 if __name__ == "__main__":
     # test here
-    print("\nga_solve : ", ga_solve("data/pb100.txt", True, 20))
+    #print("\nga_solve : ", ga_solve("data/pb020.txt", True, 2))
+    #print("\nga_solve : ", ga_solve(None, True))
+
+
+    gui = True
+    fileName = None
+    maxtime = 0
+
+    for iArg in range(1,len(sys.argv)):
+
+        if sys.argv[iArg] == "--nogui":
+            gui = False
+        elif sys.argv[iArg] == "--maxtime":
+            maxtime = int(sys.argv[iArg + 1])
+        else:
+            if sys.argv[iArg -1] != "--maxtime":
+                fileName = str(sys.argv[iArg])
+
+
+    print("GUI : ", gui)
+    print("fileName : ", fileName)
+    print("maxtime : ", maxtime)
+
+    ga_solve(fileName, gui, maxtime)

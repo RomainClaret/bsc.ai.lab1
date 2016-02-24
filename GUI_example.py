@@ -40,6 +40,7 @@ while collecting:
 		elif event.type == MOUSEBUTTONDOWN:
 			cities.append(pygame.mouse.get_pos())
 			draw(cities)
+
 			
 screen.fill(0)
 pygame.draw.lines(screen,city_color,True,cities)
