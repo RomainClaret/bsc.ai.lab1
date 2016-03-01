@@ -1,0 +1,11 @@
+python search_params_bruteforce.py 2 9 1 2 9 1 1 91 10 1 51 10
+python search_params_bruteforce.py 10 19 1 2 9 1 1 91 10 1 51 10
+python search_params_bruteforce.py 20 29 1 2 9 1 1 91 10 1 51 10
+python search_params_bruteforce.py 30 39 1 2 9 1 1 91 10 1 51 10
+python search_params_bruteforce.py 40 49 1 2 9 1 1 91 10 1 51 10
+python search_params_bruteforce.py 50 59 1 2 9 1 1 91 10 1 51 10
+python search_params_bruteforce.py 60 69 1 2 9 1 1 91 10 1 51 10
+python search_params_bruteforce.py 70 79 1 2 9 1 1 91 10 1 51 10
+python search_params_bruteforce.py 80 89 1 2 9 1 1 91 10 1 51 10
+python search_params_bruteforce.py 90 99 1 2 9 1 1 91 10 1 51 10
+python search_params_bruteforce.py 100 150 50 2 9 1 10 90 10 10 90 10

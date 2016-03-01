@@ -1,0 +1,9 @@
+length,population_size,tournaments,elitism_rate,mutation_rate,population_size_min,population_size_max,population_size_unit,tournaments_min,tournaments_max,tournaments_unit,elitism_rate_min,elitism_rate_max,elitism_rate_unit,mutation_rate_min,mutation_rate_max,mutation_rate_unit
+,,,,,1,50,1,1,9,1,1,50,1,1,41,10
+9201,1,1,1,1,,,,,,,,,,,,
+8580,1,1,1,11,,,,,,,,,,,,
+8264,1,1,1,21,,,,,,,,,,,,
+8916,1,1,1,31,,,,,,,,,,,,
+8741,1,1,1,41,,,,,,,,,,,,
+10252,1,1,2,1,,,,,,,,,,,,
+9230,1,1,2,11,,,,,,,,,,,,
